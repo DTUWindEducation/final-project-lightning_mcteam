@@ -1,0 +1,1 @@
+plot_airfoil("inputs\inputs\IEA-15-240-RWT\Airfoils\IEA-15-240-RWT_AF04_Coords.txt")
