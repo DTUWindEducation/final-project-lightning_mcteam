@@ -1,0 +1,27 @@
+# An extremely simple pyproject.toml
+# Many more options here: https://packaging.python.org/en/latest/guides/writing-pyproject-toml/
+
+# How to build your package. "[S]trongly recommended" to include this,
+# per the docs. We use hatchling, default on Python docs.
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Information on the package
+[project]
+name = "BEM"
+description = "Initial version of BEM code"
+version = "0.1"
+authors = [
+    { name = "Brandon Emanuel Aguilar Chavez", email = "s242517@dtu.dk" },
+    { name = "Tudor Istrate", email = "s243000@dtu.dk" },
+    { name = "Mohamed Akheel Mohamed Basheer", email = "s242528@dtu.dk" }
+]
+dependencies = [
+    "matplotlib",
+    "numpy",
+    "scipy"
+]
+
+[project.urls]
+Repository = "https://github.com/DTUWindEducation/final-project-lightning_mcteam.git"
