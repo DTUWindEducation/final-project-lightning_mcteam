@@ -22,7 +22,7 @@ def Aerodynamic_file_names(file_path, common_name):
 
 
 
-def Read_Blade_data(file_path):
+def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat'):
     """
     Reads the blade aerodynamic data from the specified file and organizes it into a structured format.
 
@@ -34,7 +34,7 @@ def Read_Blade_data(file_path):
         airfoil IDs, and other related parameters.
     """
     # Define the blade data file name
-    blade_file = os.path.join(file_path, 'IEA-15-240-RWT_AeroDyn15_blade.dat')
+    blade_file = os.path.join(file_path, file_name)
 
     # Read the blade data file
     with open(blade_file, 'r') as f:
@@ -211,3 +211,72 @@ def plot_airfoil(airfoil_file_names, path, blade_data):
 
     # Export the figure and axes
     return fig, ax
+
+
+def Blade_opt_data(file_path, input_file='IEA_15MW_RWT_Onshore.opt'):
+    """
+    Reads the blade optimization data from the specified file and organizes it into a structured format.
+
+    Args:
+        file_path (str): The path to the directory containing the blade optimization data file.
+        input_file (str): The name of the blade optimization data file.
+
+    Returns:
+        dict: A dictionary containing blade optimization properties such as span, chord length, twist angle,
+        and other related parameters.               WRONG
+    """
+    # Define the blade optimization data file name
+    opt_file = os.path.join(file_path, input_file)
+
+    # Read the blade optimization data file
+    with open(opt_file, 'r') as f:
+        lines = f.readlines()[1:]  # Skip the first 7 lines (header)
+
+    # Extract the optimization data and store it in a structured format
+    opt_data = {
+        'wind speed [m/s]': [],
+        'pitch [deg]': [],
+        'rot. speed [rpm]': [],
+        'aero power [kw]': [],
+        'aero thrust [kn]': []
+    }
+
+    for line in lines:
+        parts = line.split()
+        # Store the optimization data in the respective lists
+        opt_data['wind speed [m/s]'].append(float(parts[0]))
+        opt_data['pitch [deg]'].append(float(parts[1]))
+        opt_data['rot. speed [rpm]'].append(float(parts[2]))
+        opt_data['aero power [kw]'].append(float(parts[3]))
+        opt_data['aero thrust [kn]'].append(float(parts[4]))
+
+    print("Blade optimization data has been successfully organized")
+    return opt_data
+
+
+def Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius = 120):
+    """
+    Computes the Tip Speed Ratio (TSR), pitch angle, and rotational speed for a given wind speed.
+    
+    Args:
+        wind_speed (float): The wind speed in m/s.
+        blade_data (dict): A dictionary containing blade aerodynamic properties.
+        dict_opt_data (dict): A dictionary containing optimization data.
+
+    Outputs:
+        tuple: A tuple containing the computed TSR, pitch angle, and rotational speed.
+    """
+
+    wind_speed_dict = dict_opt_data['wind speed [m/s]']
+    pitch_dict = dict_opt_data['pitch [deg]']
+    rot_speed_dict = dict_opt_data['rot. speed [rpm]']
+    rot_speed_dict = [x * 2 * np.pi / 60 for x in rot_speed_dict]  # Convert to rad/s
+
+    # Interpolate the pitch and rotational speed for the given wind speed
+    pitch_interp = np.interp(wind_speed, wind_speed_dict, pitch_dict)
+    rot_speed_interp = np.interp(wind_speed, wind_speed_dict, rot_speed_dict)
+
+    tsr = rot_speed_interp * rotor_radius / wind_speed
+
+    return tsr, pitch_interp, rot_speed_interp
+    
