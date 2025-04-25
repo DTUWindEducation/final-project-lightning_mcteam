@@ -254,6 +254,10 @@ def Blade_opt_data(file_path, input_file='IEA_15MW_RWT_Onshore.opt'):
     return opt_data
 
 
+
+
+
+
 def Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius = 120):
     """
     Computes the Tip Speed Ratio (TSR), pitch angle, and rotational speed for a given wind speed.
@@ -279,4 +283,71 @@ def Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius = 120):
     tsr = rot_speed_interp * rotor_radius / wind_speed
 
     return tsr, pitch_interp, rot_speed_interp
-    
+
+
+
+
+def Compute_ind_factor(wind_speed, rot_speed, pitch_angle, blade_data, cl_list, cd_list, B=3):
+    """
+    Computes the induction factor for a given wind speed, 
+    rotational speed, and pitch angle.
+    """
+
+    a = np.zeros(len(blade_data['blade_span_m']))
+    a_prime = np.zeros(len(blade_data['blade_span_m']))
+    a_new = np.zeros(len(blade_data['blade_span_m']))
+    a_prime_new = np.zeros(len(blade_data['blade_span_m']))
+
+    # Initial guess
+    a_new[0] = 0.01
+    a_prime_new[0] = 0.01
+
+    for i in range(len(blade_data['blade_span_m'])):
+        diff_a = np.abs(a_new[i] - a[i])
+        diff_a_prime = np.abs(a_prime_new[i] - a_prime[i])
+        iteration_count = 0
+        max_iterations = 1500
+
+        while (diff_a > 1e-4 or diff_a_prime > 1e-4) and iteration_count < max_iterations:
+            c = blade_data['chord_length_m'][i]
+            r = blade_data['blade_span_m'][i]
+            if r == 0:
+                r = 1e-6
+            num = (1 - a[i]) * wind_speed
+            denom = (1 + a_prime[i]) * rot_speed * r
+            phi = np.arctan(num / denom)
+
+            beta = np.radians(blade_data['twist_angle_deg'][i])
+            pitch = np.radians(pitch_angle)
+            
+            
+
+            sigma = B * c / (2 * np.pi * r)
+            aoa = phi - (beta + pitch)
+
+            # Map airfoil_id to the corresponding file name
+            airfoil_id = blade_data['airfoil_id'][i] - 1
+            airfoil_file = list(cl_list.keys())[airfoil_id]
+
+            # Retrieve cl and cd for the considered radial position and angle of attack (aoa)
+            cl_array = cl_list[airfoil_file]
+            cd_array = cd_list[airfoil_file]
+            cl = cl_array[np.argmin(np.abs(cl_array - aoa))]
+            cd = cd_array[np.argmin(np.abs(cd_array - aoa))]
+
+            cn = cl * np.cos(phi) + cd * np.sin(phi)
+            ct = cl * np.sin(phi) - cd * np.cos(phi)
+
+            a_new[i] = 1 / ((4 * np.sin(phi) ** 2) / (sigma * cn) + 1)
+            a_prime_new[i] = 1 / ((4 * np.sin(phi) * np.cos(phi)) / (sigma * ct) - 1)
+
+            # Update values and recompute differences
+            diff_a = np.abs(a_new[i] - a[i])
+            diff_a_prime = np.abs(a_prime_new[i] - a_prime[i])
+
+            a[i] = a_new[i]
+            a_prime[i] = a_prime_new[i]
+
+            iteration_count += 1
+
+    return a, a_prime

@@ -21,19 +21,19 @@ blade_data = BEM.Read_Blade_data(INPUT_PATH / "IEA-15-240-RWT")
 # Read and order the airfoil data
 unorder_airfoil_data = BEM.Aerodynamic_file_names(INPUT_PATH / "IEA-15-240-RWT/Airfoils", "IEA-15-240-RWT_AeroDyn15_Polar_")
 order_airfoil_data = BEM.Blade_order_Airfoils(blade_data, unorder_airfoil_data)
-# print(order_airfoil_data)
+#print(order_airfoil_data)
 
 # Group lift and drag coefficient
 aerodynamic_data = BEM.Aerodynamic_inputs(order_airfoil_data, INPUT_PATH / "IEA-15-240-RWT/Airfoils")
 cl_list = BEM.Aerodynamic_inputs.group_data_cl(aerodynamic_data)
 # Print the cl_list as a table
 cl_table = pd.DataFrame(cl_list)
-# print(cl_table)
+print(cl_table)
 
 cd_list = BEM.Aerodynamic_inputs.group_data_cd(aerodynamic_data)
 # Print the cl_list as a table
 cd_table = pd.DataFrame(cd_list)
-# print(cd_table)
+#print(cd_table)
 
 #Load and order the airfoil coordinates
 unorder_airfoil_coord_names = BEM.Airfoil_coord_names(INPUT_PATH / "IEA-15-240-RWT/Airfoils", "IEA-15-240-RWT_AF")
@@ -52,4 +52,9 @@ test_opt_data = BEM.Blade_opt_data(INPUT_PATH / "IEA-15-240-RWT")
 # print(test_opt_data)
 
 tsr, pitch_interp, rot_speed_interp = BEM.Compute_TSR_pitch([15], test_opt_data)
-print(tsr, pitch_interp, rot_speed_interp)
+#print(tsr, pitch_interp, rot_speed_interp)
+
+
+
+a, a_prime= BEM.Compute_ind_factor(15, rot_speed_interp, pitch_interp, blade_data, cl_list, cd_list, B=3 )
+print(a, a_prime)
