@@ -8,8 +8,13 @@ import pandas as pd
 import pytest
 
 import tempfile
+import sys
 
-# Paths
+
+# Add the src/ directory to the path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+## Paths
 
 INPUT_PATH = pl.Path(__file__).resolve().parent.parent / "inputs"
 Blade_characteristics_path = INPUT_PATH / "IEA-15-240-RWT"
@@ -17,10 +22,11 @@ Airfoil_Aerodynamic_path = INPUT_PATH / "IEA-15-240-RWT/Airfoils"
 Airfoil_coord_path = INPUT_PATH / "IEA-15-240-RWT/Airfoils"
 Operational_characteristics_path = INPUT_PATH / "IEA-15-240-RWT"
 
-# File prefixes
+## File prefixes
 
 Aifoil_Aerodynamic_file_prefix = "IEA-15-240-RWT_AeroDyn15_Polar_"
 Aifoil_coord_file_prefix = "IEA-15-240-RWT_AF"
+
 
 
 
