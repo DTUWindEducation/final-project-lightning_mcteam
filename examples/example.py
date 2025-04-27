@@ -38,6 +38,7 @@ wind_speed = np.arange(wind_speed_start, wind_speed_end + wind_speed_step, wind_
 # Read Blade Data
 
 blade_data = BEM.Read_Blade_data(Blade_characteristics_path)
+print(blade_data)
 
 # Read and order the airfoil data
 unorder_airfoil_data = BEM.Aerodynamic_file_names(Airfoil_Aerodynamic_path, Aifoil_Aerodynamic_file_prefix)

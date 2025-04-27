@@ -22,16 +22,10 @@ def Aerodynamic_file_names(file_path, common_name):
     return aerodynamic_files
 
 
+
 def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat'):
     """
     Reads the blade aerodynamic data from the specified file and organizes it into a structured format.
-
-    Args:
-        file_path (str): The path to the directory containing the blade data file.
-
-    Returns:
-        dict: A dictionary containing blade aerodynamic properties such as span, chord length, twist angle,
-        airfoil IDs, and other related parameters.
     """
 
     # Define the blade data file name
@@ -39,7 +33,7 @@ def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat')
 
     # Read the blade data file
     with open(blade_file, 'r') as f:
-        lines = f.readlines()[6:]  # Skip the first 6 lines
+        lines = [line.strip() for line in f.readlines() if line.strip() and not line.strip().startswith("#")][6:]  # Skip header lines and first 6 lines
 
     # Extract the airfoil information and store additional blade data
     blade_data = {
@@ -384,10 +378,10 @@ def Compute_Power_Thrust(thrust, moment, rot_speed, rated_power, blade_data):
     r = np.asarray(blade_data['blade_span_m'])
 
     # Compute the total thrust by integrating over all radial segments
-    total_thrust = np.trapezoid(thrust, r)
+    total_thrust = np.trapz(thrust, r)
 
     # Compute the total power by integrating the moment over all radial segments
-    total_moment = np.trapezoid(moment, r)
+    total_moment = np.trapz(moment, r)
 
     total_power = total_moment * rot_speed
     if total_power > rated_power:
