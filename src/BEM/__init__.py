@@ -379,10 +379,10 @@ def Compute_Power_Thrust(thrust, moment, rot_speed, rated_power, blade_data):
     r = np.asarray(blade_data['blade_span_m'])
 
     # Compute the total thrust by integrating over all radial segments
-    total_thrust = np.trapz(thrust, r)
+    total_thrust = np.trapezoid(thrust, r)
 
     # Compute the total power by integrating the moment over all radial segments
-    total_moment = np.trapz(moment, r)
+    total_moment = np.trapezoid(moment, r)
 
     total_power = total_moment * rot_speed
     if total_power > rated_power:
