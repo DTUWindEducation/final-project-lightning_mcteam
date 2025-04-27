@@ -4,6 +4,7 @@ import os
 import pathlib as pl
 from mpl_toolkits.mplot3d import Axes3D
 
+
 def Aerodynamic_file_names(file_path, common_name):
     """
     This function returns the names of the aerodynamic files in the given path
@@ -21,7 +22,6 @@ def Aerodynamic_file_names(file_path, common_name):
     return aerodynamic_files
 
 
-
 def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat'):
     """
     Reads the blade aerodynamic data from the specified file and organizes it into a structured format.
@@ -33,6 +33,7 @@ def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat')
         dict: A dictionary containing blade aerodynamic properties such as span, chord length, twist angle,
         airfoil IDs, and other related parameters.
     """
+
     # Define the blade data file name
     blade_file = os.path.join(file_path, file_name)
 
@@ -71,6 +72,7 @@ def Read_Blade_data(file_path, file_name = 'IEA-15-240-RWT_AeroDyn15_blade.dat')
     print("Blade aerodynamic data and additional blade properties have been organized")
     return blade_data
 
+
 def Blade_order_Airfoils(blade_data, airfoil_data):
     """
     Arranges the aerodynamic file names in the order of the airfoil IDs.
@@ -82,6 +84,7 @@ def Blade_order_Airfoils(blade_data, airfoil_data):
     Returns:
         list: A list of aerodynamic file names arranged in the order of airfoil IDs.
     """
+
     ordered_files = []
     for airfoil_id in blade_data['airfoil_id']:
         # Format the airfoil ID to match the file naming convention
@@ -90,12 +93,15 @@ def Blade_order_Airfoils(blade_data, airfoil_data):
             if airfoil_id_str in file_name:
                 ordered_files.append(file_name)
                 break
+
     return ordered_files
+
 
 class Aerodynamic_inputs:
     """
     This class contains the aerodynamic inputs for the BEM model.
     """
+
     def __init__(self, file_list, folder_path):
         self.file_list = file_list
         self.folder_path = folder_path
@@ -159,6 +165,7 @@ class Aerodynamic_inputs:
         print("Grouped cd data by file using reference alpha from the first file")
         return grouped_cd
 
+
 def Airfoil_coord_names(file_path, common_name):
     """
     This function returns the names of the aerodynamic files in the given path
@@ -174,6 +181,7 @@ def Airfoil_coord_names(file_path, common_name):
     airfoil_files.sort()
     
     return airfoil_files
+
 
 def plot_airfoil(airfoil_file_names, path, blade_data):
     """
@@ -256,10 +264,6 @@ def Blade_opt_data(file_path, input_file='IEA_15MW_RWT_Onshore.opt'):
     return opt_data
 
 
-
-
-
-
 def Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius = 120):
     """
     Computes the Tip Speed Ratio (TSR), pitch angle, and rotational speed for a given wind speed.
@@ -285,8 +289,6 @@ def Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius = 120):
     tsr = rot_speed_interp * rotor_radius / wind_speed
 
     return tsr, pitch_interp, rot_speed_interp
-
-
 
 
 def Compute_ind_factor(wind_speed, rot_speed, pitch_angle, blade_data, cl_table, cd_table, B=3):
@@ -347,6 +349,7 @@ def Compute_ind_factor(wind_speed, rot_speed, pitch_angle, blade_data, cl_table,
             iteration_count += 1
     return a, a_prime
 
+
 def Compute_local_thrust_moemnt(a, a_prime, wind_speed, rot_speed, blade_data, density = 1.225):
     """
     Computes the local thrust and moment for a given wind speed, 
@@ -362,6 +365,7 @@ def Compute_local_thrust_moemnt(a, a_prime, wind_speed, rot_speed, blade_data, d
         moment[i] = 4*np.pi*(r**3)*density*wind_speed*rot_speed*a_prime[i]*(1-a[i])
     return thrust, moment
 
+
 def Compute_Power_Thrust(thrust, moment, rot_speed, rated_power, blade_data):
     """
     Computes the total thrust and power by integrating the local thrust and moment values.
@@ -376,6 +380,7 @@ def Compute_Power_Thrust(thrust, moment, rot_speed, rated_power, blade_data):
     Returns:
         tuple: A tuple containing the total thrust and total power.
     """
+
     r = np.asarray(blade_data['blade_span_m'])
 
     # Compute the total thrust by integrating over all radial segments
@@ -389,6 +394,7 @@ def Compute_Power_Thrust(thrust, moment, rot_speed, rated_power, blade_data):
         total_power = rated_power
 
     return float(total_thrust), float(total_power)
+
 
 def Compute_CT_CP(total_thrust, total_power, wind_speed, rot_radius, density = 1.225):
     """
@@ -411,6 +417,7 @@ def Compute_CT_CP(total_thrust, total_power, wind_speed, rot_radius, density = 1
 
     return CT, CP
 
+
 def Plot_Power_Thrust(wind_speed, total_thrust, total_power):
     """
     Plots the power and thrust curves in separate plots.
@@ -420,6 +427,7 @@ def Plot_Power_Thrust(wind_speed, total_thrust, total_power):
         total_thrust (numpy.ndarray): Array of total thrust values.
         total_power (numpy.ndarray): Array of total power values.
     """
+
     # Plot thrust
     fig1, ax1 = plt.subplots()
     ax1.set_xlabel('Wind Speed (m/s)')
@@ -440,6 +448,7 @@ def Plot_Power_Thrust(wind_speed, total_thrust, total_power):
 
     return (fig1, ax1), (fig2, ax2)
 
+
 def Plot_CT_CP(wind_speed, c_thrust, c_power):
     """
     Plots the thrust coefficient (CT) and power coefficient (CP) in separate plots.
@@ -449,6 +458,7 @@ def Plot_CT_CP(wind_speed, c_thrust, c_power):
         c_thrust (numpy.ndarray): Array of thrust coefficients.
         c_power (numpy.ndarray): Array of power coefficients.
     """
+
     # Plot CT
     fig1, ax1 = plt.subplots()
     ax1.set_xlabel('Wind Speed (m/s)')
