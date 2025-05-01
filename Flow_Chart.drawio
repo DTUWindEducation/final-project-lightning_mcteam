@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="HSMd7I8naoybt2gILDuz" name="Page-1">
-        <mxGraphModel dx="1336" dy="1027" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="850" dy="654" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -185,6 +185,20 @@
                 <mxCell id="78" value="Additional functionalities" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
                     <mxGeometry x="220" y="1145" width="80" height="30" as="geometry"/>
                 </mxCell>
+                <mxCell id="88" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="79" target="80">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1340" y="170"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="89" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="79" target="81">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1340" y="170"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
                 <mxCell id="79" value="&lt;b&gt;Aerodynamic_inputs (class)&lt;/b&gt;&lt;div&gt;(Creates tables on lift and drag coefficients corresponding to the ordered airfoils and angles of attack)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
                     <mxGeometry x="1250" y="50" width="180" height="90" as="geometry"/>
                 </mxCell>
@@ -193,6 +207,20 @@
                 </mxCell>
                 <mxCell id="81" value="&lt;b&gt;group_data_cd&lt;/b&gt;&lt;div&gt;(Groups the drag coefficient in terms of angle fo attack and the radial position)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                     <mxGeometry x="1410" y="210" width="180" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="90" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="82" target="83">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1365" y="430"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="91" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="82" target="84">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1365" y="430"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="82" value="Plot_results&lt;div&gt;&lt;span style=&quot;font-weight: normal;&quot;&gt;(Plots the calculated Power, Thrust, and their coefficients for a range of wind speeds)&lt;/span&gt;&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontStyle=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
                     <mxGeometry x="1275" y="340" width="180" height="60" as="geometry"/>
@@ -203,11 +231,28 @@
                 <mxCell id="84" value="&lt;b&gt;Plot_CT_CP&lt;/b&gt;&lt;br&gt;&lt;div&gt;(Plots the Power and Thrust coefficients calculated as a function of wind speed)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
                     <mxGeometry x="1440" y="450" width="180" height="60" as="geometry"/>
                 </mxCell>
+                <mxCell id="92" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="85" target="86">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1360" y="680"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="93" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="85" target="87">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="1360" y="680"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
                 <mxCell id="85" value="&lt;b&gt;Corrected _ind_factors&lt;/b&gt;&lt;div&gt;(Computes the inductional factors including tip losses and Glauert&#39;s correction and uses results to make a comparative plot)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=light-dark(#000000, #996500);gradientColor=none;gradientDirection=radial;shadow=0;dashed=1;strokeWidth=4;" vertex="1" parent="1">
                     <mxGeometry x="1255" y="574" width="220" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="86" value="&lt;b&gt;Plot_Power_Thrust&lt;/b&gt;&lt;br&gt;&lt;div&gt;(Plots the Power and Thrust calculated as a function of wind speed)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="1110" y="710" width="180" height="60" as="geometry"/>
+                <mxCell id="86" value="&lt;b&gt;Compute_ind_factors_corrected&lt;/b&gt;&lt;br&gt;&lt;div&gt;(Computes induction factors using Prandtl&#39;s tip correction and Glauert&#39;s method)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1110" y="710" width="190" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="87" value="&lt;b&gt;plot_compare_Power_Thrust_models&lt;/b&gt;&lt;br&gt;&lt;div&gt;(Makes comparative plots on Power and Thrust calculated with and without using the mentioned correction methods)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="1430" y="710" width="245" height="60" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
