@@ -33,6 +33,7 @@ Before running the Blade Element Momentum (BEM) code, ensure you have the follow
 - `matplotlib`
 - `pathlib`
 
+To view the flowchart of the workflow, install Draw.io extension in Visual Studio.
 ## Input Data
 
 The input data is provided in `main.py` and consists of the **IEA (International Energy Agency) 15 MW offshore reference turbine**.
@@ -138,6 +139,8 @@ final-project-lightning_mcteam/
 ├── pyproject.toml
 └── README.md
 ```
+
+A more detailed structure of the project is shown in the flowchart. You can view the flowchart by opening [this flowchart](Flow_chart.drawio) in draw.io.
 
 # Architecture
 
