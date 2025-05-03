@@ -1,29 +1,32 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
-import pathlib as pl
-import sys
-import BEM # Import the BEM module before running the script
 import pandas as pd
+import pathlib as pl
+import BEM  # Import the BEM module before running the script
 
-
-## Inputs
-#Input parameters for the wind turbine defined by IEA (International Energy Agency) 15 MW offshore reference turbine
+# Inputs
+# Input parameters for the wind turbine defined by
+# IEA (International Energy Agency) 15 MW offshore reference turbine
 wind_speed_start = 3
 wind_speed_end = 25
 wind_speed_step = 0.5
 rotor_diameter = 240
-rated_power = 15*1e6 # W
-B = 3; # Number of blades
-density = 1.225 # kg/m^3
+rated_power = 15*1e6  # W
+B = 3  # Number of blades
+density = 1.225  # kg/m^3
 
-## Paths . Find the path to the inputs folder. Inputs folder in the same directory as the script.
+# Paths . Find the path to the inputs folder. Inputs folder in
+# the same directory as the script.
 
 INPUT_PATH = pl.Path(__file__).resolve().parent.parent / "inputs"
 Blade_characteristics_path = INPUT_PATH / "IEA-15-240-RWT"
 Airfoil_Aerodynamic_path = INPUT_PATH / "IEA-15-240-RWT/Airfoils"
 Airfoil_coord_path = INPUT_PATH / "IEA-15-240-RWT/Airfoils"
 Operational_characteristics_path = INPUT_PATH / "IEA-15-240-RWT"
+
+# Define the output path
+OUTPUT_PATH = pl.Path(__file__).resolve().parent.parent / "outputs"
+OUTPUT_PATH.mkdir(exist_ok=True)
 
 ## File prefixes
 
@@ -33,19 +36,22 @@ Aifoil_coord_file_prefix = "IEA-15-240-RWT_AF"
 ## Calculations of the rotor radius and wind speed array
 
 rotor_radius = rotor_diameter / 2
-wind_speed = np.arange(wind_speed_start, wind_speed_end + wind_speed_step, wind_speed_step)
+wind_speed = np.arange(wind_speed_start, wind_speed_end + wind_speed_step,
+                       wind_speed_step)
 
 # Read Blade Data
 
 blade_data = BEM.Read_Blade_data(Blade_characteristics_path)
 
 # Read and order the airfoil data using the BEM module
-unorder_airfoil_data = BEM.Aerodynamic_file_names(Airfoil_Aerodynamic_path, Aifoil_Aerodynamic_file_prefix)
+unorder_airfoil_data = BEM.Aerodynamic_file_names(Airfoil_Aerodynamic_path,
+                                                  Aifoil_Aerodynamic_file_prefix)
 order_airfoil_data = BEM.Blade_order_Airfoils(blade_data, unorder_airfoil_data)
 
 
 # Group lift coefficient using the Aerodynamic_inputs class from BEM module
-aerodynamic_data = BEM.Aerodynamic_inputs(order_airfoil_data, Airfoil_Aerodynamic_path)
+aerodynamic_data = BEM.Aerodynamic_inputs(order_airfoil_data,
+                                          Airfoil_Aerodynamic_path)
 cl_list = BEM.Aerodynamic_inputs.group_data_cl(aerodynamic_data)
 # cl_list as a table
 cl_table = pd.DataFrame(cl_list)
@@ -57,11 +63,15 @@ cd_table = pd.DataFrame(cd_list)
 
 
 #Load and order the airfoil coordinates
-unorder_airfoil_coord_names = BEM.Airfoil_coord_names(Airfoil_coord_path, Aifoil_coord_file_prefix)
-order_airfoil_coord_names = BEM.Blade_order_Airfoils(blade_data, unorder_airfoil_coord_names)
+unorder_airfoil_coord_names = BEM.Airfoil_coord_names(Airfoil_coord_path,
+                                                      Aifoil_coord_file_prefix)
+order_airfoil_coord_names = BEM.Blade_order_Airfoils(blade_data,
+                                                     unorder_airfoil_coord_names)
 
-# Plot aifoils creates a 3-D plot of the blade by alligning all the airfoil shapes along the span
-fig, ax = BEM.plot_airfoil (unorder_airfoil_coord_names, Airfoil_coord_path, blade_data)
+# Plot aifoils creates a 3-D plot of the blade by alligning all the airfoil
+# shapes along the span
+fig, ax = BEM.plot_airfoil(unorder_airfoil_coord_names, Airfoil_coord_path,
+                           blade_data)
 
 # Load operational characteristics
 test_opt_data = BEM.Blade_opt_data(Operational_characteristics_path)
@@ -74,7 +84,8 @@ c_power = np.zeros(len(wind_speed))
 tsr = np.zeros(len(wind_speed))
 pitch_interp = np.zeros(len(wind_speed))
 
-# Calculation of Thrust, Power, CT and CP for each wind speed using the BEM module functions
+# Calculation of Thrust, Power, CT and CP for each wind speed using the
+# BEM module functions
 for i in range(1, len(wind_speed)):
     # Compute the tip speed ratio, pitch angle and rotor speed
     tsr[i], pitch_interp[i], rot_speed_interp = BEM.Compute_TSR_pitch(wind_speed[i], test_opt_data)
@@ -94,7 +105,7 @@ for i in range(1, len(wind_speed)):
 # Plot thrust, power, CT and CP using Plot_results class from BEM module
 fig_thrust_power, (ax_thurst, ax1_power) = BEM.Plot_results.Plot_Power_Thrust(wind_speed, total_thrust, total_power)
 fig_ct_cp, (ax_ct, ax1_cp) = BEM.Plot_results.Plot_CT_CP(wind_speed, c_thrust, c_power)
-# Ploting additional functionalities: CT, CP and TSR 
+# Ploting additional functionalities: CT, CP and TSR
 print("-" * 50)
 print("Started processing additional functionalities")
 fig_cp_ct_tsr, (ax_cp_tsr, ax_ct_tsr) = BEM.plot_CP_CT_TSR(tsr, c_power, c_thrust)
@@ -123,7 +134,14 @@ for i in range(1, len(wind_speed)):
 
 fig_models, (ax1_thrust_models, ax2_power_models) = BEM.Corrected_ind_factors.plot_compare_Power_Thrust_models(total_thrust, total_power, total_thrust_corrected, total_power_corrected, wind_speed)
 
+# Save all the figures to the output folder
+fig_thrust_power.savefig(OUTPUT_PATH / "thrust_power.png")
+fig_ct_cp.savefig(OUTPUT_PATH / "ct_cp.png")
+fig_cp_ct_tsr.savefig(OUTPUT_PATH / "cp_ct_tsr.png")
+fig_power_thrust_comp.savefig(OUTPUT_PATH / "power_thrust_comparison.png")
+fig_models.savefig(OUTPUT_PATH / "models_comparison.png")
 
+print(f"Plots saved to {OUTPUT_PATH}")
 
+# Show all the figures
 plt.show()
-

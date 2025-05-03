@@ -94,7 +94,7 @@ for i in range(1, len(wind_speed)):
 # Plot thrust, power, CT and CP using Plot_results class from BEM module
 fig_thrust_power, (ax_thurst, ax1_power) = BEM.Plot_results.Plot_Power_Thrust(wind_speed, total_thrust, total_power)
 fig_ct_cp, (ax_ct, ax1_cp) = BEM.Plot_results.Plot_CT_CP(wind_speed, c_thrust, c_power)
-# Ploting additional functionalities: CT, CP and TSR 
+# Ploting additional functionalities: CT, CP and TSR
 print("-" * 50)
 print("Started processing additional functionalities")
 fig_cp_ct_tsr, (ax_cp_tsr, ax_ct_tsr) = BEM.plot_CP_CT_TSR(tsr, c_power, c_thrust)

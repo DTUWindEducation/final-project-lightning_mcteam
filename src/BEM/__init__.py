@@ -481,7 +481,8 @@ def Compute_ind_factor(wind_speed, rot_speed, pitch_angle, blade_data,
                 r = 1e-6
             num = (1 - a[i]) * wind_speed
             denom = (1 + a_prime[i]) * rot_speed * r
-            phi = np.arctan(num / denom)
+            epsilon = 1e-6  # Small value to prevent division by zero
+            phi = np.arctan(num / (denom + epsilon))
 
             beta = np.radians(blade_data['twist_angle_deg'][i])
             pitch = np.radians(pitch_angle)
@@ -874,7 +875,8 @@ class Corrected_ind_factors:
                 # Compute flow angle (phi)
                 num = (1 - a[i]) * wind_speed
                 denom = (1 + a_prime[i]) * rot_speed * r
-                phi = np.arctan(num / denom)
+                epsilon = 1e-6  # Small value to prevent division by zero
+                phi = np.arctan(num / (denom + epsilon))
 
                 # Compute angle of attack (aoa)
                 aoa = phi - (beta + pitch)

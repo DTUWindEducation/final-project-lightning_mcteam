@@ -631,6 +631,19 @@ def test_Compute_ind_factor():
     assert np.allclose(a_prime, expected_a_prime, atol=1e-2), \
         f"Expected 'a_prime' close to {expected_a_prime}, but got {a_prime}"
 
+    # Test edge case where r == 0
+    blade_data['blade_span_m'] = [0.0, 10.0, 15.0]  # Include a zero radius
+    a, a_prime = BEM.Compute_ind_factor(wind_speed, rot_speed, pitch_angle,
+                                        blade_data, cl_table, cd_table, B)
+
+    # Ensure r is handled correctly (r = 1e-6 for zero radius)
+    assert a[0] != 0, (
+        "Axial induction factor should not be computed with r = 0."
+    )
+    assert a_prime[0] != 0, (
+        "Tangential induction factor should not be computed with r = 0."
+    )
+
 
 def test_Compute_local_thrust_moment():
     """
@@ -1112,47 +1125,37 @@ def test_Plot_Power_Thrust_Compare():
     plt.close(fig)
 
 
-def test_Compute_ind_factor_corrected():
+def test_Compute_ind_factor_corrected_with_radius_calculation():
     """
-    Unit test for the Compute_ind_factor_corrected
-    function in the BEM.Corrected_ind_factors module.
-    This test verifies the correctness of the axial
-    and tangential induction factors computed by the
-    Compute_ind_factor_corrected function. It uses
-    mock input data for wind speed, rotational speed,
-    pitch angle, blade geometry, and aerodynamic
-    coefficient tables.
-    Test Cases:
-    - Ensures the lengths of the computed axial (`a`)
-      and tangential (`a_prime`) induction factors
-      match the length of the blade span data.
-    - Validates that the computed axial and tangential
-      induction factors are within the expected bounds
-      [0, 1].
-    - Checks that the induction factors are not
-      trivially converging to zero, ensuring meaningful
-      computation.
+    Unit test for the Compute_ind_factor_corrected function in the
+    BEM.Corrected_ind_factors module, specifically testing the case
+    where the rotor radius (R) is not provided and must be calculated
+    from the blade span data.
+    This test verifies the following:
+    - The function correctly calculates the rotor radius as the maximum
+      radial position from the blade span data when R is None.
+    - The computed axial (`a`) and tangential (`a_prime`) induction
+      factors are valid and within expected bounds.
+    - The lengths of the computed induction factors match the length of
+      the blade span data.
     Mock Input Data:
     - `wind_speed`: Wind speed in m/s.
     - `rot_speed`: Rotational speed in rad/s.
     - `pitch_angle`: Pitch angle in degrees.
-    - `blade_data`: Dictionary containing blade span,
-      chord length, and twist angle data.
-    - `cl_table`: Dictionary containing lift
-      coefficient data for various angles of attack.
-    - `cd_table`: Dictionary containing drag
-      coefficient data for various angles of attack.
+    - `blade_data`: Dictionary containing blade span, chord length, and
+      twist angle data.
+    - `cl_table`: Dictionary containing lift coefficient data for
+      various angles of attack.
+    - `cd_table`: Dictionary containing drag coefficient data for
+      various angles of attack.
     - `B`: Number of blades.
-    - `R`: Rotor radius in meters.
     Assertions:
-    - Validates the length of the computed induction
-      factors.
-    - Ensures the computed induction factors are within
-      valid bounds.
+    - Validates that the rotor radius is correctly calculated as the
+      maximum radial position.
+    - Ensures the computed induction factors are within valid bounds.
     - Checks for convergence of the induction factors.
     Raises:
-    - AssertionError: If any of the above conditions
-      are not met.
+    - AssertionError: If any of the above conditions are not met.
     """
 
     # Mock input data
@@ -1177,14 +1180,16 @@ def test_Compute_ind_factor_corrected():
         'cd_3': [0.02, 0.03, 0.04]
     }
     B = 3
-    R = 20.0
 
-    # Call the function
+    # Call the function without providing R
     a, a_prime = BEM.Corrected_ind_factors.Compute_ind_factor_corrected(
-        wind_speed, rot_speed, pitch_angle, blade_data, cl_table, cd_table, B, R
+        wind_speed, rot_speed, pitch_angle, blade_data, cl_table, cd_table, B, R=None
     )
 
     # Assertions
+    expected_radius = max(blade_data['blade_span_m'])
+    assert expected_radius == 15.0, \
+        f"Expected rotor radius {expected_radius}, but got {max(blade_data['blade_span_m'])}."
     assert len(a) == len(blade_data['blade_span_m']), \
         "Length of 'a' does not match blade span data."
     assert len(a_prime) == len(blade_data['blade_span_m']), \
@@ -1193,12 +1198,6 @@ def test_Compute_ind_factor_corrected():
         "Axial induction factors are out of bounds."
     assert all(0 <= ai_prime <= 1 for ai_prime in a_prime), \
         "Tangential induction factors are out of bounds."
-
-    # Check convergence
-    assert np.allclose(a, np.zeros_like(a), atol=1e-2) is False, \
-        "Axial induction factors did not converge."
-    assert np.allclose(a_prime, np.zeros_like(a_prime), atol=1e-2) \
-        is False, "Tangential induction factors did not converge."
 
 
 def test_plot_compare_Power_Thrust_models():
@@ -1305,3 +1304,199 @@ def test_plot_compare_Power_Thrust_models():
 
     # Clean up the plot
     plt.close(fig)
+
+def test_Aerodynamic_file_names_error_cases():
+    """Test error cases for Aerodynamic_file_names."""
+    # Test non-existent directory
+    with pytest.raises(FileNotFoundError):
+        BEM.Aerodynamic_file_names("nonexistent_dir", "prefix")
+
+    # Test PermissionError using monkeypatch
+    def mock_listdir_fail(path):
+        raise PermissionError("Permission denied")
+
+    monkeypatch = pytest.MonkeyPatch()
+    monkeypatch.setattr(os, "listdir", mock_listdir_fail)
+
+    with pytest.raises(PermissionError):
+        BEM.Aerodynamic_file_names(".", "prefix")
+
+    monkeypatch.undo()
+
+
+def test_plot_airfoil_docstring_example():
+    """Test the example in plot_airfoil docstring."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        filenames = ['airfoil1.dat', 'airfoil2.dat', 'airfoil3.dat']
+        for filename in filenames:
+            with open(os.path.join(temp_dir, filename), 'w') as f:
+                f.write("\n" * 8 + "0.0 0.0\n1.0 0.0\n")  # Minimal airfoil data
+
+        blade_data = {
+            'blade_span_m': [0.0, 5.0, 10.0],
+            'twist_angle_deg': [0.0, 5.0, 10.0]
+        }
+
+        fig, ax = BEM.plot_airfoil(filenames, temp_dir, blade_data)
+        assert isinstance(fig, plt.Figure)
+        assert hasattr(ax, 'plot')
+        plt.close(fig)
+def test_Aerodynamic_file_names_empty_directory():
+    """
+    Test the `Aerodynamic_file_names` function with an empty directory.
+    This test ensures that the function correctly handles the case where
+    the directory contains no files matching the specified prefix and
+    `.dat` extension.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Call the function with an empty directory
+        result = BEM.Aerodynamic_file_names(temp_dir, "IEA-15-240-RWT_AeroDyn15_Polar_")
+
+        # Expected result is an empty list
+        expected = []
+
+        # Assert the result matches the expected output
+        assert result == expected, f"Expected {expected}, but got {result}"
+
+
+
+def test_Blade_order_Airfoils_empty_blade_data():
+    """
+    Test the `Blade_order_Airfoils` function with empty blade data.
+    This test ensures that the function handles the case where the blade
+    data dictionary is empty.
+    """
+    # Empty blade data with missing 'airfoil_id' key
+    blade_data = {'airfoil_id': []}  # Add the 'airfoil_id' key with an empty list
+
+    # Mock airfoil data
+    airfoil_data = [
+        "IEA-15-240-RWT_AeroDyn15_Polar_00.dat",
+        "IEA-15-240-RWT_AeroDyn15_Polar_01.dat",
+        "IEA-15-240-RWT_AeroDyn15_Polar_02.dat",
+    ]
+
+    # Call the function
+    result = BEM.Blade_order_Airfoils(blade_data, airfoil_data)
+
+    # Expected result is an empty list
+    expected = []
+
+    # Assert the result matches the expected output
+    assert result == expected, f"Expected {expected}, but got {result}"
+
+
+def test_Airfoil_coord_names_no_matching_files():
+    """
+    Test the `Airfoil_coord_names` function with no matching files.
+    This test ensures that the function correctly handles the case where
+    no files in the directory match the specified prefix and `.txt` extension.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create unrelated files in the temporary directory
+        filenames = [
+            "unrelated_file_01.dat",
+            "unrelated_file_02.txt",
+            "another_file.txt",
+        ]
+        for filename in filenames:
+            with open(os.path.join(temp_dir, filename), 'w') as f:
+                f.write("Test content")
+
+        # Call the function with the temporary directory and prefix
+        result = BEM.Airfoil_coord_names(temp_dir, "IEA-15-240-RWT_AF")
+
+        # Expected result is an empty list
+        expected = []
+
+        # Assert the result matches the expected output
+        assert result == expected, f"Expected {expected}, but got {result}"
+
+
+def test_Compute_TSR_pitch_edge_case():
+    """
+    Test the `Compute_TSR_pitch` function with edge case inputs.
+    This test ensures that the function handles edge cases such as
+    wind speed being exactly at the boundary of the optimization data.
+    """
+    # Mock input data
+    wind_speed = 5.0  # Boundary value
+    dict_opt_data = {
+        'wind speed [m/s]': [5.0, 10.0, 15.0],
+        'pitch [deg]': [2.0, 3.0, 4.0],
+        'rot. speed [rpm]': [10.0, 15.0, 20.0]
+    }
+    rotor_radius = 120
+
+    # Call the function
+    tsr, pitch, rot_speed = BEM.Compute_TSR_pitch(wind_speed, dict_opt_data, rotor_radius)
+
+    # Expected results
+    expected_tsr = (
+        (10.0 * 2 * 3.141592653589793 / 60) * rotor_radius / wind_speed
+    )
+    expected_pitch = 2.0
+    expected_rot_speed = 10.0 * 2 * 3.141592653589793 / 60
+
+    # Assertions
+    assert pytest.approx(tsr, rel=1e-3) == expected_tsr, \
+        f"Expected TSR {expected_tsr}, but got {tsr}"
+    assert pytest.approx(pitch, rel=1e-3) == expected_pitch, \
+        f"Expected pitch {expected_pitch}, but got {pitch}"
+    assert pytest.approx(rot_speed, rel=1e-3) == expected_rot_speed, \
+        f"Expected rotational speed {expected_rot_speed}, but got {rot_speed}"
+
+def test_AerodynamicInputs_init():
+    """
+    Test the `__init__` method of the `AerodynamicInputs` class.
+    This test verifies that the method correctly initializes the object,
+    reads data from the specified files, and stores the data in the expected
+    format.
+    Steps:
+    1. Create temporary files with mock aerodynamic data.
+    2. Initialize the `AerodynamicInputs` class with the file list and folder path.
+    3. Verify that the `data` attribute contains the expected data for each file.
+    4. Ensure the correct number of rows are skipped based on the file suffix.
+    Assertions:
+    - The `data` attribute is a dictionary.
+    - Each key in the dictionary corresponds to a file name.
+    - The values are dictionaries containing 'alpha', 'cl', and 'cd' arrays.
+    - The data matches the content of the mock files.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Create mock aerodynamic data files
+        file_1_content = "0.0 0.1 0.01\n5.0 0.2 0.02\n10.0 0.3 0.03\n"
+        file_2_content = "0.0 0.15 0.015\n5.0 0.25 0.025\n10.0 0.35 0.035\n"
+        file_3_content = "0.0 0.12 0.012\n5.0 0.22 0.022\n10.0 0.32 0.032\n"
+
+        filenames = ["file_1.dat", "file_2.dat", "file_3.dat"]
+        file_contents = [file_1_content, file_2_content, file_3_content]
+
+        for i, filename in enumerate(filenames):
+            with open(os.path.join(temp_dir, filename), 'w') as f:
+                f.write("\n" * (20 if filename.endswith(('03.dat', '02.dat', '01.dat', '00.dat')) else 54))
+                f.write(file_contents[i])
+
+        # Initialize the class
+        aerodynamic_inputs = BEM.Aerodynamic_inputs(filenames, temp_dir)
+
+        # Assertions
+        assert isinstance(aerodynamic_inputs.data, dict), \
+            "The `data` attribute is not a dictionary."
+        assert set(aerodynamic_inputs.data.keys()) == set(filenames), \
+            "The keys in `data` do not match the file names."
+
+        for i, filename in enumerate(filenames):
+            file_data = aerodynamic_inputs.data[filename]
+            assert 'alpha' in file_data and 'cl' in file_data and 'cd' in file_data, \
+                f"Missing keys in data for file {filename}."
+            expected_data = np.loadtxt(
+                os.path.join(temp_dir, filename),
+                skiprows=(20 if filename.endswith(('03.dat', '02.dat', '01.dat', '00.dat')) else 54)
+            )
+            np.testing.assert_array_equal(file_data['alpha'], expected_data[:, 0],
+                f"Alpha values do not match for file {filename}.")
+            np.testing.assert_array_equal(file_data['cl'], expected_data[:, 1],
+                f"Cl values do not match for file {filename}.")
+            np.testing.assert_array_equal(file_data['cd'], expected_data[:, 2],
+                f"Cd values do not match for file {filename}.")

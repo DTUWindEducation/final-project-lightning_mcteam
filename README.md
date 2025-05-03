@@ -5,9 +5,9 @@
 
 The **BEM Module** is a package based on **Blade Element Momentum (BEM) theory**, designed to help users process data, calculate aerodynamic forces, and plot wind turbine results.
 
-## How to Download?
+# Installation Guide
 
-The package is already saved in this repository. To install it, open a new terminal and run the following command:
+The package is called 'BEM' and is already saved in this repository. To install it, open a new terminal and run the following command:
 
 ```bash
 pip install -e .
@@ -19,13 +19,13 @@ Team: [ADD TEXT HERE!]
 
 # Overview
 
-The code works with the wind turbine modelling project. Its purpose is to run the BEM (Blade Element Momentum) calculations to solve a wind turbine blade. The project is meant to be downloadable and then used as-is. 
+The code works with the wind turbine modelling project. Its purpose is to run the BEM (Blade Element Momentum) calculations to solve a wind turbine blade. The project is meant to be downloadable and then used as-is.
 
-The output, if the code is run correctly, should be comprised of the values of the aerodynamic coefficients, forces, and powers, and the corresponding plots. Additionally, one will get a 3D visualisation of the root of the blade. 
+The output, if the code is run correctly, should be comprised of the values of the aerodynamic coefficients, forces, and powers, and the corresponding plots. Additionally, one will get a 3D visualisation of the root of the blade.
 
 # Quick-start Guide
 
-# Prerequisites
+## Prerequisites
 
 Before running the Blade Element Momentum (BEM) code, ensure you have the following libraries installed. The required Python version is **Python 3.11.11**.
 
@@ -35,7 +35,7 @@ Before running the Blade Element Momentum (BEM) code, ensure you have the follow
 
 ## Input Data
 
-The input data is provided in `main.py` and consists of the **IEA (International Energy Agency) 15 MW offshore reference turbine**. 
+The input data is provided in `main.py` and consists of the **IEA (International Energy Agency) 15 MW offshore reference turbine**.
 
 Users should specify the following wind speed parameters based on their analysis needs:
 
@@ -45,14 +45,15 @@ Users should specify the following wind speed parameters based on their analysis
 
 For more details on the parameters used in the **IEA 15 MW reference wind turbine**, consult the references.
 
-# Provided Data
+## Data provided
 
-The dataset includes:
+The dataset provided in the couse is used and this includes:
 
 - **Blade Geometry**
 - **Operational Strategy**
 - **Airfoil Coordinates**
 - **Aerodynamic Behaviour of Airfoils**
+
 
 # Project Structure
 
@@ -101,55 +102,33 @@ For more information regarding the structure, please look at the tree file  belo
 
 ```text
 final-project-lightning_mcteam/
-├── src/
-│   ├── BEM/
-│   │   ├── __init__.py
-│   │   ├── bem_utils.py
-│   │   ├── aerodynamic_data/
-│   │   │   ├── airfoil_00.dat
-│   │   │   ├── airfoil_01.dat
-│   │   │   ├── airfoil_02.dat
-│   │   │   ├── airfoil_03.dat
+├── examples/
+│   ├── example.py
+│   └── main.py
+│
+├── inputs/
+│   ├── IEA-15-240-RWT/
+│   │   ├── Airfoils/
+│   │   │   ├── IEA-15-240-RWT_AeroDyn15_Polar_00.dat
+│   │   │   ├── IEA-15-240-RWT_AeroDyn15_Polar_01.dat
+│   │   │   ├── IEA-15-240-RWT_AeroDyn15_Polar_02.dat
 │   │   │   └── ...
-│   │   ├── blade_data/
-│   │   │   ├── IEA-15-240-RWT_AeroDyn15_blade.dat
-│   │   │   └── ...
-│   │   └── plots/
-│   │       ├── thrust_vs_wind_speed.png
-│   │       ├── power_vs_wind_speed.png
-│   │       └── ...
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   ├── file_io.py
-│   │   └── math_helpers.py
-│   └── tests/
-│       ├── test_bem.py
-│       ├── test_utils.py
-│       └── ...
-├── data/
-│   ├── optimization/
 │   │   ├── IEA_15MW_RWT_Onshore.opt
-│   │   └── ...
-│   ├── wind_profiles/
-│   │   ├── wind_profile_01.csv
-│   │   ├── wind_profile_02.csv
-│   │   └── ...
-│   └── ...
-├── notebooks/
-│   ├── analysis.ipynb
-│   ├── visualization.ipynb
-│   └── ...
-├── docs/
-│   ├── README.md
-│   ├── requirements.txt
-│   ├── user_guide.pdf
-│   └── ...
+│   │   └── IEA-15-240-RWT_AeroDyn15_blade.dat
+│   └── rotor_diagram.jpeg
+│
+├── src/
+│   └── BEM/
+│       └── __init__.py
+│
 ├── tests/
-│   ├── test_aerodynamics.py
-│   ├── test_blade_data.py
-│   └── ...
-└── main.py
-```
+│   └── test_functions.py
+│
+├── Flow_Chart.drawio
+├── LICENSE
+├── pyproject.toml
+└── README.md
+
 
 # Architecture
 
@@ -158,13 +137,13 @@ Each function in the project includes a docstring explaining its purpose. Below 
 ## Functions
 
 ### `Aerodynamic_file_names`
-This function is used to retrieve all the files containing the aerodynamic information of different airfoils. The folder containing these files and the prefix of the file names are given as inputs to this function. It returns the file names as a list. 
+This function is used to retrieve all the files containing the aerodynamic information of different airfoils. The folder containing these files and the prefix of the file names are given as inputs to this function. It returns the file names as a list.
 
 ### `Read_Blade_data`
-This function is used to read the characteristics like **sweep angle, twist angle**, etc., and the airfoil used (mentioned as a number which is later accessed by comparing the number to the name of the airfoil data) in each radial segment of the  blade. The values are stored as a dictionary. 
+This function is used to read the characteristics like **sweep angle, twist angle**, etc., and the airfoil used (mentioned as a number which is later accessed by comparing the number to the name of the airfoil data) in each radial segment of the  blade. The values are stored as a dictionary.
 
 ### `Blade_order_Airfoils`
-Function is designed to organize a list of aerodynamic file names (which is the aerodynamic characteristsics of different airfoils) based on the order of airfoil IDs specified in `blade_data` dictionary. 
+Function is designed to organize a list of aerodynamic file names (which is the aerodynamic characteristsics of different airfoils) based on the order of airfoil IDs specified in `blade_data` dictionary.
 
 ## `Aerodynamic_inputs` Class
 
@@ -200,7 +179,7 @@ Computes **local thrust and moment** for a wind turbine blade based on wind spee
 Calculates total **thrust and power** for the turbine rotor by integrating local thrust/moment values across radial segments and applying a power limit check.
 
 ### `Compute_CT_CP`
-The  function calculates the **thrust coefficient** (CT) and **power coefficient (CP)** to assess rotor performance. It uses inputs like thrust, power, wind speed, rotor radius, and air density to compute dimensionless efficiency metrics, returning CT and CP for aerodynamic analysis. 
+The  function calculates the **thrust coefficient** (CT) and **power coefficient (CP)** to assess rotor performance. It uses inputs like thrust, power, wind speed, rotor radius, and air density to compute dimensionless efficiency metrics, returning CT and CP for aerodynamic analysis.
 
 ## Plotting Functions
 
@@ -231,4 +210,4 @@ We all decided to meet physically and worked on one of our laptops. We tried to 
 
 # References
 
-1. Gaertner, E., Rinker, J., Sethuraman, L., Zahle, F., Anderson, B., Barter, G., Abbas, N., Meng, F., Bortolotti, P., Skrzypinski, W., Scott, G., Feil, R., Bredmose, H., Dykes, K., Shields, M., Allen, C., & Viselli, A. (2020). Definition of the IEA 15-Megawatt Offshore Reference Wind Turbine. National Renewable Energy Laboratory (NREL). 
+1. Gaertner, E., Rinker, J., Sethuraman, L., Zahle, F., Anderson, B., Barter, G., Abbas, N., Meng, F., Bortolotti, P., Skrzypinski, W., Scott, G., Feil, R., Bredmose, H., Dykes, K., Shields, M., Allen, C., & Viselli, A. (2020). Definition of the IEA 15-Megawatt Offshore Reference Wind Turbine. National Renewable Energy Laboratory (NREL).
