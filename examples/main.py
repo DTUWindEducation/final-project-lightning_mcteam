@@ -61,7 +61,7 @@ cd_list = BEM.Aerodynamic_inputs.group_data_cd(aerodynamic_data)
 # cd_list as a table
 cd_table = pd.DataFrame(cd_list)
 
-
+print("The lift and drag coefficients are computed as a function of radial position and angle of attack.")
 #Load and order the airfoil coordinates
 unorder_airfoil_coord_names = BEM.Airfoil_coord_names(Airfoil_coord_path,
                                                       Aifoil_coord_file_prefix)
@@ -83,26 +83,32 @@ c_thrust = np.zeros(len(wind_speed))
 c_power = np.zeros(len(wind_speed))
 tsr = np.zeros(len(wind_speed))
 pitch_interp = np.zeros(len(wind_speed))
+rot_speed_interp = np.zeros(len(wind_speed))
 
 # Calculation of Thrust, Power, CT and CP for each wind speed using the
 # BEM module functions
 for i in range(1, len(wind_speed)):
     # Compute the tip speed ratio, pitch angle and rotor speed
-    tsr[i], pitch_interp[i], rot_speed_interp = BEM.Compute_TSR_pitch(wind_speed[i], test_opt_data)
+    tsr[i], pitch_interp[i], rot_speed_interp[i] = BEM.Compute_TSR_pitch(wind_speed[i], test_opt_data)
 
     # Compute induction factors
-    a, a_prime= BEM.Compute_ind_factor(wind_speed[i], rot_speed_interp, pitch_interp[i], blade_data, cl_list, cd_list, B )
-
+    a, a_prime= BEM.Compute_ind_factor(wind_speed[i], rot_speed_interp[i], pitch_interp[i], blade_data, cl_list, cd_list, B )
+    
     # Compute the local thrust and moment
-    thrust, moment = BEM.Compute_local_thrust_moment(a, a_prime, wind_speed[i], rot_speed_interp, blade_data, density)
+    thrust, moment = BEM.Compute_local_thrust_moment(a, a_prime, wind_speed[i], rot_speed_interp[i], blade_data, density)
 
     # Compute the total thrust and power
-    total_thrust[i], total_power[i] = BEM.Compute_Power_Thrust(thrust, moment, rot_speed_interp, rated_power, blade_data)
+    total_thrust[i], total_power[i] = BEM.Compute_Power_Thrust(thrust, moment, rot_speed_interp[i], rated_power, blade_data)
 
     # Compute the thrust and power coefficients
     c_thrust[i], c_power[i] = BEM.Compute_CT_CP(total_thrust[i], total_power[i], wind_speed[i], rotor_radius, density)
 
+
+# Plot rotational speed and pitch as a function of wind speed
+print("Plotting optimal rotational speed and pitch vs. wind speed...")
+fig_rot_speed, (ax_rot_speed, ax_pitch) = BEM.Plot_rotspeed_pitch(wind_speed, pitch_interp, rot_speed_interp)
 # Plot thrust, power, CT and CP using Plot_results class from BEM module
+print("Plotting power, thrust, and their coefficients vs. wind speed...")
 fig_thrust_power, (ax_thurst, ax1_power) = BEM.Plot_results.Plot_Power_Thrust(wind_speed, total_thrust, total_power)
 fig_ct_cp, (ax_ct, ax1_cp) = BEM.Plot_results.Plot_CT_CP(wind_speed, c_thrust, c_power)
 # Ploting additional functionalities: CT, CP and TSR

@@ -7,7 +7,7 @@ The **BEM Module** is a package based on **Blade Element Momentum (BEM) theory**
 
 # Installation Guide
 
-The package is called 'BEM' and is already saved in this repository. To install it, open a new terminal and run the following command:
+The package is called 'BEM' and is already saved in this repository, under source (src). To install the package, open a new terminal and run the following command:
 
 ```bash
 pip install -e .
@@ -15,9 +15,9 @@ pip install -e .
 
 # Colaboation
 
-Team: [ADD TEXT HERE!]
+Refer the document [Collaboration.md](Collaboration.md) for a brief overview of collaboration and contributions.
 
-# Overview
+# Overview of the package (BEM)
 
 The code works with the wind turbine modelling project. Its purpose is to run the BEM (Blade Element Momentum) calculations to solve a wind turbine blade. The project is meant to be downloadable and then used as-is.
 
@@ -84,11 +84,16 @@ This script contains **19 functions** and **3 classes**, which are detailed in t
 - `Blade_opt_data`
 - `Compute_TSR_pitch`
 - `Compute_ind_factor`
-- `Compute_local_thrust_moemnt`
+- `Compute_local_thrust_moment`
 - `Compute_Power_Thrust`
 - `Compute_CT_CP`
 - `Plot_Power_Thrust`
-- `Plot_CT_CP`
+- `Plot_CP_CT_TSR`
+- `Plot_Power_Thrust_Compare`
+- `Compute_ind_factors_corrected`
+- `Plot_compare_Power_Thrust_models`
+- `Plot_rotspeed_pitch`
+
 
 ## `test_functions.py`
 
@@ -140,9 +145,9 @@ final-project-lightning_mcteam/
 └── README.md
 ```
 
-A more detailed structure of the project is shown in the flowchart. You can view the flowchart by opening [Flow_chart.drawio](Flow_chart.drawio). If the file doesn't open in Github, please try in VisualStudioCode.
-
 # Architecture
+
+A detailed structure and architecture of the project is shown in the flowchart. You can view the flowchart by opening [Flow_chart.drawio](Flow_chart.drawio). If the file doesn't open in Github, please try in VisualStudioCode.
 
 Each function in the project includes a docstring explaining its purpose. Below is a summary of their functionality.
 
@@ -203,6 +208,10 @@ This class is used to create the main plots required as outputs whoch includes t
 #### Functions in `Plot_results` Class:
 - **`Plot_Power_Thrust`** -  Generates two plots which includes, **Thrust vs. Wind Speed** and **Power vs. Wind Speed**. Uses Matplotlib for formatting axes, colors, and units, and returns figure and axis objects for further customization.
 - **`Plot_CT_CP`** - Generates two plots which includes, **Thrust Coefficient (CT) vs. Wind Speed** and **Power Coefficient (CP) vs. Wind Speed**. Formats axes, colors, and grids for improved clarity and returns figure and axis objects for additional customization.
+
+### `Plot_rotspeed_pitch`
+
+This function creates two plots which includes, **Rotational Speed vs. Wind Speed** and **Pitch angle vs. Wind Speed**, with teh optimal values found for pitch and rotational speed at different wind speeds using the optimized data provided.
 
 ### `Plot_CP_CT_TSR` (Additional functionality)
 

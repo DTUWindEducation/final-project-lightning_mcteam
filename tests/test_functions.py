@@ -1500,3 +1500,61 @@ def test_AerodynamicInputs_init():
                 f"Cl values do not match for file {filename}.")
             np.testing.assert_array_equal(file_data['cd'], expected_data[:, 2],
                 f"Cd values do not match for file {filename}.")
+
+def test_Plot_rotspeed_pitch():
+    """
+    Test the `Plot_rotspeed_pitch` function.
+    This test verifies that the function correctly generates two subplots:
+    one for pitch angle vs wind speed and another for rotational speed vs wind speed.
+    It checks the following:
+    - The returned object is a matplotlib Figure with two subplots.
+    - The first subplot (Pitch Angle vs Wind Speed) has the correct labels, title, and data.
+    - The second subplot (Rotational Speed vs Wind Speed) has the correct labels, title, and data.
+    - The rotational speed is correctly converted from rad/s to rpm.
+    - The data plotted in the subplots matches the input data.
+    """
+    # Mock input data
+    wind_speed = np.array([5, 10, 15, 20])
+    pitch = np.array([2.0, 4.0, 6.0, 8.0])  # in degrees
+    rot_speed = np.array([1.0, 2.0, 3.0, 4.0])  # in rad/s
+
+    # Call the function
+    fig, (ax1, ax2) = BEM.Plot_rotspeed_pitch(wind_speed, pitch, rot_speed)
+
+    # Assertions for the figure and axes
+    assert isinstance(fig, plt.Figure), \
+        "Returned object is not a matplotlib Figure."
+    assert len(fig.axes) == 2, \
+        "Figure does not contain two subplots."
+
+    # Assertions for the first subplot (Pitch Angle vs Wind Speed)
+    assert ax1.get_xlabel() == 'Wind Speed (m/s)', \
+        "First subplot x-axis label is incorrect."
+    assert ax1.get_ylabel() == 'Pitch Angle (deg)', \
+        "First subplot y-axis label is incorrect."
+    assert ax1.get_title() == 'Pitch Angle vs Wind Speed', \
+        "First subplot title is incorrect."
+    assert len(ax1.lines) == 1, \
+        "First subplot should have one line."
+    assert np.array_equal(ax1.lines[0].get_xdata(), wind_speed), \
+        "First subplot x-data is incorrect."
+    assert np.array_equal(ax1.lines[0].get_ydata(), pitch), \
+        "First subplot y-data is incorrect."
+
+    # Assertions for the second subplot (Rotational Speed vs Wind Speed)
+    assert ax2.get_xlabel() == 'Wind Speed (m/s)', \
+        "Second subplot x-axis label is incorrect."
+    assert ax2.get_ylabel() == 'Rotational Speed (rpm)', \
+        "Second subplot y-axis label is incorrect."
+    assert ax2.get_title() == 'Rotational Speed vs Wind Speed', \
+        "Second subplot title is incorrect."
+    assert len(ax2.lines) == 1, \
+        "Second subplot should have one line."
+    assert np.array_equal(ax2.lines[0].get_xdata(), wind_speed), \
+        "Second subplot x-data is incorrect."
+    expected_rot_speed_rpm = rot_speed * 60 / (2 * np.pi)
+    assert np.allclose(ax2.lines[0].get_ydata(), expected_rot_speed_rpm), \
+        "Second subplot y-data (rotational speed in rpm) is incorrect."
+
+    # Clean up the plot
+    plt.close(fig)

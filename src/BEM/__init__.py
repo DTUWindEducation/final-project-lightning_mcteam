@@ -359,6 +359,7 @@ def plot_airfoil(airfoil_file_names, path, blade_data):
     return fig, ax
 
 
+
 def Blade_opt_data(file_path, input_file='IEA_15MW_RWT_Onshore.opt'):
     """
     Reads the blade optimization data from the specified file.
@@ -1000,3 +1001,42 @@ class Corrected_ind_factors:
         plt.tight_layout()
 
         return fig, (ax1, ax2)
+
+def Plot_rotspeed_pitch(wind_speed, pitch, rot_speed):
+    """
+    Plots pitch angle and rotational speed as functions of wind speed.
+
+    Args:
+        wind_speed (list or numpy.ndarray): Array of wind speeds.
+        pitch (list or numpy.ndarray): Array of pitch angles (in degrees).
+        rot_speed (list or numpy.ndarray): Array of rotational speeds (in rad/s).
+
+    Returns:
+        tuple: A tuple containing the figure and axes objects.
+    """
+    # Convert rotational speed from rad/s to rpm for better readability
+    rot_speed_rpm = np.array(rot_speed) * 60 / (2 * np.pi)
+
+    # Create a figure with 2 subplots (1 row, 2 columns)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+
+    # Plot pitch angle on the first subplot
+    ax1.plot(wind_speed, pitch, color='tab:blue', label='Pitch Angle')
+    ax1.set_xlabel('Wind Speed (m/s)')
+    ax1.set_ylabel('Pitch Angle (deg)', color='tab:blue')
+    ax1.tick_params(axis='y', labelcolor='tab:blue')
+    ax1.grid(True)
+    ax1.set_title('Pitch Angle vs Wind Speed')
+
+    # Plot rotational speed on the second subplot
+    ax2.plot(wind_speed, rot_speed_rpm, color='tab:red', label='Rotational Speed')
+    ax2.set_xlabel('Wind Speed (m/s)')
+    ax2.set_ylabel('Rotational Speed (rpm)', color='tab:red')
+    ax2.tick_params(axis='y', labelcolor='tab:red')
+    ax2.grid(True)
+    ax2.set_title('Rotational Speed vs Wind Speed')
+
+    # Adjust layout for better spacing
+    plt.tight_layout()
+
+    return fig, (ax1, ax2)
