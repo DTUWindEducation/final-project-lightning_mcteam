@@ -10,8 +10,8 @@ build-backend = "hatchling.build"
 # Information on the package
 [project]
 name = "BEM"
-description = "Initial version of BEM code"
-version = "0.1"
+description = "Final version of BEM code that helps to caluclate the aerodynamic power and thrust of a wind turbine"
+version = "1.0"
 authors = [
     { name = "Brandon Emanuel Aguilar Chavez", email = "s242517@dtu.dk" },
     { name = "Tudor Istrate", email = "s243000@dtu.dk" },
@@ -20,7 +20,8 @@ authors = [
 dependencies = [
     "matplotlib",
     "numpy",
-    "scipy"
+    "scipy",
+    "pandas"
 ]
 
 [project.urls]
