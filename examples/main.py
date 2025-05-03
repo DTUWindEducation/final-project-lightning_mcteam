@@ -126,3 +126,4 @@ fig_models, (ax1_thrust_models, ax2_power_models) = BEM.Corrected_ind_factors.pl
 
 
 plt.show()
+
