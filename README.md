@@ -140,7 +140,7 @@ final-project-lightning_mcteam/
 └── README.md
 ```
 
-A more detailed structure of the project is shown in the flowchart. You can view the flowchart by opening [this flowchart](Flow_chart.drawio) in draw.io.
+A more detailed structure of the project is shown in the flowchart. You can view the flowchart by opening [Flow_chart.drawio](Flow_chart.drawio). If the file doesn't open in Github, please try in VisualStudioCode.
 
 # Architecture
 
