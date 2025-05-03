@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 import pathlib as pl
-import sys
 import BEM # Import the BEM module before running the script
 import pandas as pd
 
