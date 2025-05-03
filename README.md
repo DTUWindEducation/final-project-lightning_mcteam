@@ -117,6 +117,13 @@ final-project-lightning_mcteam/
 │   │   └── IEA-15-240-RWT_AeroDyn15_blade.dat
 │   └── rotor_diagram.jpeg
 │
+├── outputs/
+│   ├── cp_ct_tsr.png
+│   ├── ct_cp.png
+│   ├── models_comparison.png
+│   ├── power_thrust_comparison.png
+│   └── thrust_power.png
+│
 ├── src/
 │   └── BEM/
 │       └── __init__.py
@@ -124,11 +131,13 @@ final-project-lightning_mcteam/
 ├── tests/
 │   └── test_functions.py
 │
+├── .gitignore
+├── Collaboration.md
 ├── Flow_Chart.drawio
 ├── LICENSE
 ├── pyproject.toml
 └── README.md
-
+```
 
 # Architecture
 
@@ -145,67 +154,70 @@ This function is used to read the characteristics like **sweep angle, twist angl
 ### `Blade_order_Airfoils`
 Function is designed to organize a list of aerodynamic file names (which is the aerodynamic characteristsics of different airfoils) based on the order of airfoil IDs specified in `blade_data` dictionary.
 
-## `Aerodynamic_inputs` Class
+### `Aerodynamic_inputs` Class
 
 This class is used to group the lift and drag coefficients based on the different airfoils used in different radial segments of blade and the different angles of attack (as mentioned in the aerodynamic characteristics of each airfoil). This class consists of the following functions:
 
-### Functions in `Aerodynamic_inputs` Class:
+#### Functions in `Aerodynamic_inputs` Class:
 - **`group_data_cl`** – Creates a table of lift coefficient (`Cl`) data using the angle of attack values of the first file as reference.
 - **`group_data_cd`** – Creates a table of drag coefficient (`Cd`) data using the angle of attack values of the first file as reference.
 
-## Other Functions
-
 ### `Airfoil_coord_names`
-Returns the names of aerodynamic files that start with a given common prefix.
+By giving the location of folder containing the files with the coordinates for airfoils and the prefix of the files as inputs, a list is created with the filenames containing the coordinates of different airfoils used.
+
+
+### `Blade_opt_data`
+Reads the **optimization blade data file** and returns a dictionary containing parameters like **span, chord length, twist angle**, and more. The path to the file and the filename are given as inputs.
+
+### `Compute_TSR_pitch`
+Calculates the **tip speed ratio (λ), pitch angle (θ), and angular velocity (ω)** for a given wind speed by interpolating θ and ω, at the refernce wind speeds provided in the **optimization blade data file**.
+
+### `Compute_ind_factor`
+Uses the **tip speed ratio (λ), pitch angle (θ), and angular velocity (ω)** to initialize aerodynamic computations. Here the axial and tangential induction factors are caluclated using Madson's correction method. Prandtl's tip correction is not included here.
+
+### `Compute_local_thrust_moment`
+Computes **local thrust and moment** at each element considered in the blade of a wind turbine based on wind speed, the interpolated values of rotational speed, blade geometry and the calculated axial and tangential induction factors. This function iterates through blade segments and returns arrays of aerodynamic forces.
+
+### `Compute_Power_Thrust`
+Calculates total **thrust and power** for the turbine rotor by integrating local thrust/moment values across radial segments and applying a power limit check (thus if the power increases beyond the rated wind speed (as documented for the reference wind turbine considered), teh power is limitted to rated power).
+
+### `Compute_CT_CP`
+The  function calculates the **thrust coefficient** (CT) and **power coefficient (CP)** to assess rotor performance. It uses inputs like the caluclated thrust, calculated power, wind speed, rotor radius, and air density to compute dimensionless efficiency metrics, returning CT and CP for aerodynamic analysis.
+
+### `Corrected_ind_factors` Class (Additional functionality)
+This class is used to calculate the axial and tangential induction factors using Glauert's correction method and using Prandtl's tip correction, and then use it to calculate the overall aerodynamic power and thrust. This class consists of the following functions:
+#### Functions in `Corrected_ind_factors` Class:
+- **`Compute_ind_factors_corrected` (Additional functionality)**  – Computes the axial and tangential induction factors using Glauert's correction method and using Prandtl's tip correction. Uses the **tip speed ratio (λ), pitch angle (θ), and angular velocity (ω)** to initialize aerodynamic computations.
+- **`plot_compare_Power_Thrust_models` (Additional functionality)** – Uses the power and thrust calculated using the axial and tangential induction factors obtained using **'Compute_ind_factors'** and **'Compute_ind_factors_corrected'** functions and makes a comprative plot between them.
+
+## Plotting Functions
 
 ### `Plot_airfoil`
 Generates a **3D plot** of the blade by aligning airfoil shapes along the span while incorporating the twist angle for each section.
 
-### `Blade_opt_data`
-Reads the **optimization blade data file** and returns a dictionary containing parameters like **span, chord length, twist angle**, and more.
+### `Plot_results` Class
+This class is used to create the main plots required as outputs whoch includes the plots of power, thrust and their coefficients. This class consists of the following functions:
+#### Functions in `Plot_results` Class:
+- **`Plot_Power_Thrust`** -  Generates two plots which includes, **Thrust vs. Wind Speed** and **Power vs. Wind Speed**. Uses Matplotlib for formatting axes, colors, and units, and returns figure and axis objects for further customization.
+- **`Plot_CT_CP`** - Generates two plots which includes, **Thrust Coefficient (CT) vs. Wind Speed** and **Power Coefficient (CP) vs. Wind Speed**. Formats axes, colors, and grids for improved clarity and returns figure and axis objects for additional customization.
 
-### `Compute_TSR_pitch`
-Calculates the **tip speed ratio (λ), pitch angle (θ), and angular velocity (ω)** for a given wind speed by interpolating θ and ω.
+### `Plot_CP_CT_TSR` (Additional functionality)
 
-## `Corrected_ind_factors` Class
+This function creates two plots which includes, **Power coefficient(CP) vs. Tip Speed Ratio (TSR)** and **Thrust coefficient(CT) vs. Tip Speed Ratio (TSR)**, with the calculated values of CP, CT and TSR. this is used to verify the optimal values of TSR for obtaining maximum CP.
 
-### `Compute_ind_factor`
-Uses the **tip speed ratio (λ), pitch angle (θ), and angular velocity (ω)** to initialize aerodynamic computations.
+### `Plot_Power_Thrust_Compare` (Additional functionality)
 
-### `Compute_local_thrust_moment`
-Computes **local thrust and moment** for a wind turbine blade based on wind speed, rotational speed, and blade geometry. Iterates through blade segments and returns aerodynamic force arrays.
-
-### `Compute_Power_Thrust`
-Calculates total **thrust and power** for the turbine rotor by integrating local thrust/moment values across radial segments and applying a power limit check.
-
-### `Compute_CT_CP`
-The  function calculates the **thrust coefficient** (CT) and **power coefficient (CP)** to assess rotor performance. It uses inputs like thrust, power, wind speed, rotor radius, and air density to compute dimensionless efficiency metrics, returning CT and CP for aerodynamic analysis.
-
-## Plotting Functions
-
-### `Plot_Power_Thrust`
-Generates two plots:
-- **Thrust vs. Wind Speed**
-- **Power vs. Wind Speed**
-
-Uses Matplotlib for formatting axes, colors, and units, and returns figure and axis objects for further customization.
-
-### `Plot_CT_CP`
-Generates two plots:
-- **Thrust Coefficient (CT) vs. Wind Speed**
-- **Power Coefficient (CP) vs. Wind Speed**
-
-Formats axes, colors, and grids for improved clarity and returns figure and axis objects for additional customization.
+This function creates two plots for power and thrust respectively and comapres the values of power and thrsut (calculated using the induction factors obtained with **'Compute_ind_factors'** function) with the optimal valies of Power and Thurst given in the **optimization blade data** file.
 
 # Peer review
+
+All the memebers of the team took turns to write the code, and the code written by one member is peer reviewd by the other two members systematically. This is also done before merging the branches to main using **Pull Requests**.
 
 ## Team Members
 
 - Akheel
 - Brandon
 - Tudor
-
-We all decided to meet physically and worked on one of our laptops. We tried to switch the laptops from one session to another, so that everyone gets to push/commit. All the team members have exchanged roles and have worked on all the weeks' tasks and the final project.
 
 
 # References
