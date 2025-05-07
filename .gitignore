@@ -1,4 +1,5 @@
 # files to ignore in this repo
+inputs/
 outputs/
 
 # Byte-compiled / optimized / DLL files
